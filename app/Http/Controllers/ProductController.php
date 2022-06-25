@@ -46,12 +46,17 @@ class ProductController extends Controller
         ]);
 
         try{
-            $imageName = Str::random().'.'.$request->image->getClientOriginalExtention();
-            Storage::disk('public')->putFileAs('product/image', $request->image,$imageName);
-            Product::create($request->post()+['image'=>$imageName]);
+            $image = $request->image;
+            $imagename = time().'.'.$image->getClientoriginalExtension();
+            $request->image->move('product/image', $imagename);
+            Product::create($request->post()+['image'=>$imagename]);
+
+            // $imageName = Str::random().'.'.$request->image->getClientOriginalExtention();
+            // Storage::disk('public')->put('product/image', $request->image,$imageName);
+            // Product::create($request->post()+['image'=>$imageName]);
 
             return response()->json([
-                'message'=>'Product Sreated Successfully.'
+                'message'=>'Product Created Successfully.'
             ]);
         }catch(\Exception $e){
             \Log::error($e->getMessage());
@@ -107,16 +112,20 @@ class ProductController extends Controller
             if($request->hasFile('image')){
 
                 // remove old image
-                if($product->image){
-                    $exists = Storage::disk('public')->exists("product/image/{$product->image}");
-                    if($exists){
-                        Storage::disk('public')->delete("product/image/{$product->image}");
-                    }
-                }
+                // if($product->image){
+                //     $exists = Storage::disk('public')->exists("product/image/{$product->image}");
+                //     if($exists){
+                //         Storage::disk('public')->delete("product/image/{$product->image}");
+                //     }
+                // }
 
-                $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
-                Storage::disk('public')->putFileAs('product/image', $request->image,$imageName);
-                $product->image = $imageName;
+                // $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
+                // Storage::disk('public')->putFileAs('product/image', $request->image,$imageName);
+                // $product->image = $imageName;
+                $image = $request->image;
+                $imagename = time().'.'.$image->getClientoriginalExtension();
+                $request->image->move('product/image', $imagename);
+                $product->image = $imagename;
                 $product->save();
             }
 
